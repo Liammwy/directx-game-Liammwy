@@ -64,12 +64,12 @@ void Player::Tick(GameData* _GD)
 	}
 
 	//move player up and down
-	if (_GD->m_KBS.R)
+	if (_GD->m_KBS.Space)
 	{
 		m_acc.y += 40.0f;
 	}
 
-	if (_GD->m_KBS.F)
+	if (_GD->m_KBS.LeftShift)
 	{
 		m_acc.y -= 40.0f;
 	}

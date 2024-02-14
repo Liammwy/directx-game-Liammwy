@@ -59,7 +59,7 @@ void Game::Initialize(HWND _window, int _width, int _height)
 
     //create GameData struct and populate its pointers
     m_GD = new GameData;
-    m_GD->m_GS = GS_PLAY_MAIN_CAM;
+    m_GD->m_GS = GS_PLAY_TPS_CAM;
 
     //set up systems for 2D rendering
     m_DD2D = new DrawData2D();
@@ -275,17 +275,21 @@ void Game::Update(DX::StepTimer const& _timer)
     ReadInput();
     //upon space bar switch camera state
     //see docs here for what's going on: https://github.com/Microsoft/DirectXTK/wiki/Keyboard
-    if (m_GD->m_KBS_tracker.pressed.Space)
-    {
-        if (m_GD->m_GS == GS_PLAY_MAIN_CAM)
-        {
-            m_GD->m_GS = GS_PLAY_TPS_CAM;
-        }
-        else
-        {
-            m_GD->m_GS = GS_PLAY_MAIN_CAM;
-        }
-    }
+
+    
+    // Changing camera upon space bar press.
+    //if (m_GD->m_KBS_tracker.pressed.Space)
+    //{
+    //    if (m_GD->m_GS == GS_PLAY_MAIN_CAM)
+    //    {
+    //        m_GD->m_GS = GS_PLAY_TPS_CAM;
+    //    }
+    //    else
+    //    {
+    //        m_GD->m_GS = GS_PLAY_MAIN_CAM;
+    //    }
+    //}
+    //
 
     //update all objects
     for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
