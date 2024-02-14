@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "Game.h"
 #include <time.h>
+#include <iostream>
 
 //Scarle Headers
 #include "GameData.h"
@@ -98,8 +99,9 @@ void Game::Initialize(HWND _window, int _width, int _height)
     m_GameObjects.push_back(new Tree(4, 4, .6f, 10.0f * Vector3::Up, XM_PI / 6.0f, "JEMINA vase -up", m_d3dDevice.Get(), m_fxFactory));
 
     //Vertex Buffer Game Objects
+
     FileVBGO* terrainBox = new FileVBGO("terrainTex", m_d3dDevice.Get());
-    m_GameObjects.push_back(terrainBox);
+    m_GOFloors.push_back(terrainBox);
 
     FileVBGO* Box = new FileVBGO("cube", m_d3dDevice.Get());
     m_GameObjects.push_back(Box);
@@ -154,9 +156,8 @@ void Game::Initialize(HWND _window, int _width, int _height)
     m_GameObjects.push_back(pPlayer);
 
     //add a secondary camera
-    m_TPScam = new TPSCamera(0.25f * XM_PI, AR, 3.5f, 10000.0f, pPlayer, Vector3::UnitY, Vector3(0.0f, 00.0f, 0.1f));
+    m_TPScam = new TPSCamera(0.25f * XM_PI, AR, 3.5f, 10000.0f, pPlayer, Vector3::UnitY, Vector3(0.0f, 0.0f, 0.01f));
     m_GameObjects.push_back(m_TPScam);
-
 
     //test all GPGOs
     float* params = new float[3];

@@ -59,20 +59,22 @@ void Player::Tick(GameData* _GD)
 
 	//change orinetation of player
 	float rotSpeed = 2.0f * _GD->m_dt;
-	std::cout << _GD->m_MS.x << std::endl;
-	std::cout << _GD->m_MS.y << std::endl;
 
-	m_pitch += _GD->m_MS.y * rotSpeed / 2 * -1;
-	m_yaw += _GD->m_MS.x * rotSpeed / 2 * -1;
+	// Camera movement via mouse input.
+	m_pitch += (_GD->m_MS.y * rotSpeed / 2) * -1;
+	m_yaw += (_GD->m_MS.x * rotSpeed / 2) * -1;
 
+	Vector3 sideMove = 40.0f * Vector3::Left;
+	Matrix rotMove = Matrix::CreateRotationY(m_yaw);
+	sideMove = Vector3::Transform(sideMove, rotMove);
 
 	if (_GD->m_KBS.A)
 	{
-		m_yaw += rotSpeed;
+		m_acc += sideMove;
 	}
 	if (_GD->m_KBS.D)
 	{
-		m_yaw -= rotSpeed;
+		m_acc -= sideMove;
 	}
 
 	//move player up and down
