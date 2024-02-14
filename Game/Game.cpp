@@ -101,7 +101,7 @@ void Game::Initialize(HWND _window, int _width, int _height)
     //Vertex Buffer Game Objects
 
     FileVBGO* terrainBox = new FileVBGO("terrainTex", m_d3dDevice.Get());
-    m_GOFloors.push_back(terrainBox);
+    m_GameObjects.push_back(terrainBox);
 
     FileVBGO* Box = new FileVBGO("cube", m_d3dDevice.Get());
     m_GameObjects.push_back(Box);
@@ -255,6 +255,18 @@ void Game::Tick()
 // Updates the world.
 void Game::Update(DX::StepTimer const& _timer)
 {
+    switch (m_GD->m_GS)
+    {
+    case GS_START:
+    {
+        m_GD->m_KBS = m_keyboard->GetState();
+        //quit game on hiting escape
+        if (m_GD->m_KBS.Enter)
+        {
+            m_GD->m_GS = GS_PLAY_TPS_CAM;
+        }
+    }
+    }
     float elapsedTime = float(_timer.GetElapsedSeconds());
     m_GD->m_dt = elapsedTime;
 
