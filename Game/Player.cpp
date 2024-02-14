@@ -2,6 +2,7 @@
 #include "Player.h"
 #include <dinput.h>
 #include "GameData.h"
+#include <iostream>
 
 Player::Player(string _fileName, ID3D11Device* _pd3dDevice, IEffectFactory* _EF) : CMOGO(_fileName, _pd3dDevice, _EF)
 {
@@ -48,12 +49,23 @@ void Player::Tick(GameData* _GD)
 		{
 			m_acc -= forwardMove;
 		}
+
+		// up down pitch
+		// left right yaw
+
 		break;
 	}
 	}
 
 	//change orinetation of player
 	float rotSpeed = 2.0f * _GD->m_dt;
+	std::cout << _GD->m_MS.x << std::endl;
+	std::cout << _GD->m_MS.y << std::endl;
+
+	m_pitch += _GD->m_MS.y * rotSpeed / 2 * -1;
+	m_yaw += _GD->m_MS.x * rotSpeed / 2 * -1;
+
+
 	if (_GD->m_KBS.A)
 	{
 		m_yaw += rotSpeed;

@@ -154,8 +154,9 @@ void Game::Initialize(HWND _window, int _width, int _height)
     m_GameObjects.push_back(pPlayer);
 
     //add a secondary camera
-    m_TPScam = new TPSCamera(0.25f * XM_PI, AR, 1.0f, 10000.0f, pPlayer, Vector3::UnitY, Vector3(0.0f, 10.0f, 50.0f));
+    m_TPScam = new TPSCamera(0.25f * XM_PI, AR, 3.5f, 10000.0f, pPlayer, Vector3::UnitY, Vector3(0.0f, 00.0f, 0.1f));
     m_GameObjects.push_back(m_TPScam);
+
 
     //test all GPGOs
     float* params = new float[3];
@@ -219,9 +220,10 @@ void Game::Initialize(HWND _window, int _width, int _height)
     ImageGO2D* logo = new ImageGO2D("logo_small", m_d3dDevice.Get());
     logo->SetPos(200.0f * Vector2::One);
     m_GameObjects2D.push_back(logo);
-    ImageGO2D* bug_test = new ImageGO2D("bug_test", m_d3dDevice.Get());
-    bug_test->SetPos(300.0f * Vector2::One);
-    m_GameObjects2D.push_back(bug_test);
+
+    //ImageGO2D* bug_test = new ImageGO2D("bug_test", m_d3dDevice.Get());
+    //bug_test->SetPos(300.0f * Vector2::One);
+    //m_GameObjects2D.push_back(bug_test);
 
     TextGO2D* text = new TextGO2D("Test Text");
     text->SetPos(Vector2(100, 10));
@@ -416,8 +418,8 @@ void Game::OnWindowSizeChanged(int _width, int _height)
 void Game::GetDefaultSize(int& _width, int& _height) const noexcept
 {
     // TODO: Change to desired default window size (note minimum size is 320x200).
-    _width = 800;
-    _height = 600;
+    _width = 1600;
+    _height = 1200;
 }
 
 // These are the resources that depend on the device.
