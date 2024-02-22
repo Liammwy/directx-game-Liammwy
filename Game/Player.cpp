@@ -11,8 +11,8 @@ Player::Player(string _fileName, ID3D11Device* _pd3dDevice, IEffectFactory* _EF)
 
 	m_pos.y = 10.0f;
 
-	SetDrag(0.9);
-	SetPhysicsOn(true);
+	SetDrag(0.7);
+	SetPhysicsOn(false);
 }
 
 Player::~Player()
@@ -21,17 +21,17 @@ Player::~Player()
 }
 
 
-void Player::Tick(GameData* _GD)
+void Player::Tick(GameData* _GameData)
 {
-	switch (_GD->m_GS)
+	switch (_GameData->m_GameState)
 	{
 	case GS_PLAY_MAIN_CAM:
 	{
 		{
 			//MOUSE CONTROL SCHEME HERE
 			float speed = 10.0f;
-			m_acc.x += speed * _GD->m_MS.x;
-			m_acc.z += speed * _GD->m_MS.y;
+			m_acc.x += speed * _GameData->m_MouseState.x;
+			m_acc.z += speed * _GameData->m_MouseState.y;
 			break;
 		}
 	}
@@ -41,11 +41,12 @@ void Player::Tick(GameData* _GD)
 		Vector3 forwardMove = 40.0f * Vector3::Forward;
 		Matrix rotMove = Matrix::CreateRotationY(m_yaw);
 		forwardMove = Vector3::Transform(forwardMove, rotMove);
-		if (_GD->m_KBS.W)
+
+		if (_GameData->m_KeyboardState.W)
 		{
 			m_acc += forwardMove;
 		}
-		if (_GD->m_KBS.S)
+		if (_GameData->m_KeyboardState.S)
 		{
 			m_acc -= forwardMove;
 		}
@@ -58,32 +59,35 @@ void Player::Tick(GameData* _GD)
 	}
 
 	//change orinetation of player
-	float rotSpeed = 2.0f * _GD->m_dt;
+	float rotSpeed = 2.0f * _GameData->m_dt;
 
 	// Camera movement via mouse input.
-	m_pitch += (_GD->m_MS.y * rotSpeed / 2) * -1;
-	m_yaw += (_GD->m_MS.x * rotSpeed / 2) * -1;
+	m_pitch += (_GameData->m_MouseState.y * rotSpeed / 2) * -1;
+	m_yaw += (_GameData->m_MouseState.x * rotSpeed / 2) * -1;
+
+	if (m_pitch > XMConvertToRadians(60)) m_pitch = XMConvertToRadians(60);
+	if (m_pitch < -XMConvertToRadians(60)) m_pitch = -XMConvertToRadians(-60);
 
 	Vector3 sideMove = 40.0f * Vector3::Left;
 	Matrix rotMove = Matrix::CreateRotationY(m_yaw);
 	sideMove = Vector3::Transform(sideMove, rotMove);
 
-	if (_GD->m_KBS.A)
+	if (_GameData->m_KeyboardState.A)
 	{
 		m_acc += sideMove;
 	}
-	if (_GD->m_KBS.D)
+	if (_GameData->m_KeyboardState.D)
 	{
 		m_acc -= sideMove;
 	}
 
 	//move player up and down
-	if (_GD->m_KBS.Space)
+	if (_GameData->m_KeyboardState.Space)
 	{
 		m_acc.y += 40.0f;
 	}
 
-	if (_GD->m_KBS.LeftShift)
+	if (_GameData->m_KeyboardState.LeftShift)
 	{
 		m_acc.y -= 40.0f;
 	}
@@ -99,5 +103,5 @@ void Player::Tick(GameData* _GD)
 	}
 
 	//apply my base behaviour
-	CMOGO::Tick(_GD);
+	CMOGO::Tick(_GameData);
 }

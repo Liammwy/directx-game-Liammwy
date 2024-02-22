@@ -65,6 +65,7 @@ protected:
 
 	//very basic physics
 	bool m_physicsOn = false;
+	bool m_doRender = false;
 	float m_drag = 0.0f;
 	Vector3 m_vel = Vector3::Zero;
 	Vector3 m_acc = Vector3::Zero;

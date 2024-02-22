@@ -60,7 +60,7 @@ void Game::Initialize(HWND _window, int _width, int _height)
 
     //create GameData struct and populate its pointers
     m_GD = new GameData;
-    m_GD->m_GS = GS_PLAY_TPS_CAM;
+    m_GD->m_GameState = GS_PLAY_TPS_CAM;
 
     //set up systems for 2D rendering
     m_DD2D = new DrawData2D();
@@ -85,23 +85,14 @@ void Game::Initialize(HWND _window, int _width, int _height)
     //create a set of dummy things to show off the engine
 
     //create a base light
-    m_light = new Light(Vector3(0.0f, 100.0f, 160.0f), Color(1.0f, 1.0f, 1.0f, 1.0f), Color(0.4f, 0.1f, 0.1f, 1.0f));
+    m_light = new Light(Vector3(0.0f, 100.0f, 160.0f),
+        Color(1.0f, 1.0f, 1.0f, 1.0f),
+        Color(0.4f, 0.1f, 0.1f, 1.0f));
+
     m_GameObjects.push_back(m_light);
 
     //find how big my window is to correctly calculate my aspect ratio
     float AR = (float)_width / (float)_height;
-
-    //example basic 3D stuff
-    Terrain* terrain = new Terrain("table", m_d3dDevice.Get(), m_fxFactory, Vector3(100.0f, 0.0f, 100.0f), 0.0f, 0.0f, 0.0f, 0.25f * Vector3::One);
-    m_GameObjects.push_back(terrain);
-
-    //L-system like tree
-    m_GameObjects.push_back(new Tree(4, 4, .6f, 10.0f * Vector3::Up, XM_PI / 6.0f, "JEMINA vase -up", m_d3dDevice.Get(), m_fxFactory));
-
-    //Vertex Buffer Game Objects
-
-    FileVBGO* terrainBox = new FileVBGO("terrainTex", m_d3dDevice.Get());
-    m_GameObjects.push_back(terrainBox);
 
     FileVBGO* Box = new FileVBGO("cube", m_d3dDevice.Get());
     m_GameObjects.push_back(Box);
@@ -111,104 +102,24 @@ void Game::Initialize(HWND _window, int _width, int _height)
 
     VBCube* cube = new VBCube();
     cube->init(11, m_d3dDevice.Get());
-    cube->SetPos(Vector3(100.0f, 0.0f, 0.0f));
-    cube->SetScale(4.0f);
+    cube->SetPos(Vector3(0.0f, -0.25f, 0.0f));
+    cube->SetScale(100.0f, 0.5f, 100.0f);
     m_GameObjects.push_back(cube);
 
-    VBSpike* spikes = new VBSpike();
-    spikes->init(11, m_d3dDevice.Get());
-    spikes->SetPos(Vector3(0.0f, 0.0f, 100.0f));
-    spikes->SetScale(4.0f);
-    m_GameObjects.push_back(spikes);
-
-    VBSpiral* spiral = new VBSpiral();
-    spiral->init(11, m_d3dDevice.Get());
-    spiral->SetPos(Vector3(-100.0f, 0.0f, 0.0f));
-    spiral->SetScale(4.0f);
-    m_GameObjects.push_back(spiral);
-
-    VBPillow* pillow = new VBPillow();
-    pillow->init(11, m_d3dDevice.Get());
-    pillow->SetPos(Vector3(-100.0f, 0.0f, -100.0f));
-    pillow->SetScale(4.0f);
-    m_GameObjects.push_back(pillow);
-
-    VBSnail* snail = new VBSnail(m_d3dDevice.Get(), "shell", 150, 0.98f, 0.09f * XM_PI, 0.4f, Color(1.0f, 0.0f, 0.0f, 1.0f), Color(0.0f, 0.0f, 1.0f, 1.0f));
-    snail->SetPos(Vector3(-100.0f, 0.0f, 100.0f));
-    snail->SetScale(2.0f);
-    m_GameObjects.push_back(snail);
-
-    //Marching Cubes
-    VBMarchCubes* VBMC = new VBMarchCubes();
-    VBMC->init(Vector3(-8.0f, -8.0f, -17.0f), Vector3(8.0f, 8.0f, 23.0f), 60.0f * Vector3::One, 0.01, m_d3dDevice.Get());
-    VBMC->SetPos(Vector3(100, 0, -100));
-    VBMC->SetPitch(-XM_PIDIV2);
-    VBMC->SetScale(Vector3(3, 3, 1.5));
-    m_GameObjects.push_back(VBMC);
+    //add Player
+    Player* pPlayer = new Player("BirdModelV1", m_d3dDevice.Get(), m_fxFactory);
+    m_GameObjects.push_back(pPlayer);
 
     //create a base camera
     m_cam = new Camera(0.25f * XM_PI, AR, 1.0f, 10000.0f, Vector3::UnitY, Vector3::Zero);
     m_cam->SetPos(Vector3(0.0f, 200.0f, 200.0f));
     m_GameObjects.push_back(m_cam);
 
-    //add Player
-    Player* pPlayer = new Player("BirdModelV1", m_d3dDevice.Get(), m_fxFactory);
-    m_GameObjects.push_back(pPlayer);
-
     //add a secondary camera
-    m_TPScam = new TPSCamera(0.25f * XM_PI, AR, 3.5f, 10000.0f, pPlayer, Vector3::UnitY, Vector3(0.0f, 0.0f, 0.01f));
-    m_GameObjects.push_back(m_TPScam);
+    m_TPScam = new TPSCamera(0.25f * XM_PI, AR, 3.5f, 10000.0f, 
+        pPlayer, Vector3::UnitY, Vector3(0.0f, 0.0f, 0.01f));
 
-    //test all GPGOs
-    float* params = new float[3];
-    params[0] = 10.f;  params[1] = 20.0f; params[2] = 30.f;
-    GPGO* pGPGO = new GPGO(m_d3dContext.Get(), GPGO_BOX, (float*)&Colors::Azure, params);
-    pGPGO->SetPos(Vector3(-50.0f, 10.0f, -100.f));
-    m_GameObjects.push_back(pGPGO);
-    params[0] = params[1] = 20.0f; params[2] = (size_t)32;
-    pGPGO = new GPGO(m_d3dContext.Get(), GPGO_CONE, (float*)&Colors::Navy,params);
-    pGPGO->SetPos(Vector3(-50.0f, 10.0f, -70.f));
-    m_GameObjects.push_back(pGPGO);
-    params[0] = 15.0f;
-    pGPGO = new GPGO(m_d3dContext.Get(), GPGO_CUBE, (float*)&Colors::SeaGreen, params);
-    pGPGO->SetPos(Vector3(-50.0f, 10.0f, -40.f));
-    m_GameObjects.push_back(pGPGO);
-    params[0] = params[1] = 20.0f; params[2] = (size_t)32;
-    pGPGO = new GPGO(m_d3dContext.Get(), GPGO_CYLINDER, (float*)&Colors::OliveDrab, params);
-    pGPGO->SetPos(Vector3(-50.0f, 10.0f, -10.f));
-    m_GameObjects.push_back(pGPGO);
-    params[0] = 15.0f;
-    pGPGO = new GPGO(m_d3dContext.Get(), GPGO_DODECAHEDRON, (float*)&Colors::OrangeRed,params);
-    pGPGO->SetPos(Vector3(-50.0f, 10.0f, 20.f));
-    m_GameObjects.push_back(pGPGO);
-    params[0] =  15.0f; params[1] = (size_t)3;
-    pGPGO = new GPGO(m_d3dContext.Get(), GPGO_GEOSPHERE, (float*)&Colors::BlueViolet, params);
-    pGPGO->SetPos(Vector3(-50.0f, 10.0f, 50.f));
-    m_GameObjects.push_back(pGPGO);
-    params[0] = 20;
-    pGPGO = new GPGO(m_d3dContext.Get(), GPGO_ICOSAHEDRON, (float*)&Colors::DodgerBlue, params);
-    pGPGO->SetPos(Vector3(-50.0f, 10.0f, 80.f));
-    m_GameObjects.push_back(pGPGO);
-    params[0] = 20;
-    pGPGO = new GPGO(m_d3dContext.Get(), GPGO_OCTAHEDRON, (float*)&Colors::PaleTurquoise, params);
-    pGPGO->SetPos(Vector3(-50.0f, 10.0f, 110.f));
-    m_GameObjects.push_back(pGPGO);
-    params[0] = 15.0f; params[1] = (size_t)16;
-    pGPGO = new GPGO(m_d3dContext.Get(), GPGO_SPHERE, (float*)&Colors::LawnGreen, params);
-    pGPGO->SetPos(Vector3(-50.0f, 10.0f, 140.0));
-    m_GameObjects.push_back(pGPGO);
-    params[0] = 15.0f; params[1] = (size_t)8;
-    pGPGO = new GPGO(m_d3dContext.Get(), GPGO_TEAPOT, (float*)&Colors::YellowGreen, params);
-    pGPGO->SetPos(Vector3(-50.0f, 10.0f, 170.0f));
-    m_GameObjects.push_back(pGPGO);
-    params[0] = 20;
-    pGPGO = new GPGO(m_d3dContext.Get(), GPGO_TETRAHEDRON, (float*)&Colors::Firebrick, params);
-    pGPGO->SetPos(Vector3(-50.0f, 10.0f, 200.f));
-    m_GameObjects.push_back(pGPGO);
-    params[0] = 30.0f; params[1] = 10.0f; params[2] = (size_t)32;
-    pGPGO = new GPGO(m_d3dContext.Get(), GPGO_TORUS, (float*)&Colors::Aquamarine, params);
-    pGPGO->SetPos(Vector3(-50.0f, 10.0f, 230.f));
-    m_GameObjects.push_back(pGPGO);
+    m_GameObjects.push_back(m_TPScam);
 
     //create DrawData struct and populate its pointers
     m_DD = new DrawData;
@@ -216,29 +127,6 @@ void Game::Initialize(HWND _window, int _width, int _height)
     m_DD->m_states = m_states;
     m_DD->m_cam = m_cam;
     m_DD->m_light = m_light;
-
-    //example basic 2D stuff
-    ImageGO2D* logo = new ImageGO2D("logo_small", m_d3dDevice.Get());
-    logo->SetPos(200.0f * Vector2::One);
-    m_GameObjects2D.push_back(logo);
-
-    //ImageGO2D* bug_test = new ImageGO2D("bug_test", m_d3dDevice.Get());
-    //bug_test->SetPos(300.0f * Vector2::One);
-    //m_GameObjects2D.push_back(bug_test);
-
-    TextGO2D* text = new TextGO2D("Test Text");
-    text->SetPos(Vector2(100, 10));
-    text->SetColour(Color((float*)&Colors::Yellow));
-    m_GameObjects2D.push_back(text);
-
-    //Test Sounds
-    Loop* loop = new Loop(m_audioEngine.get(), "NightAmbienceSimple_02");
-    loop->SetVolume(0.1f);
-    loop->Play();
-    m_Sounds.push_back(loop);
-
-    TestSound* TS = new TestSound(m_audioEngine.get(), "Explo1");
-    m_Sounds.push_back(TS);
 }
 
 // Executes the basic game loop.
@@ -255,15 +143,15 @@ void Game::Tick()
 // Updates the world.
 void Game::Update(DX::StepTimer const& _timer)
 {
-    switch (m_GD->m_GS)
+    switch (m_GD->m_GameState)
     {
     case GS_START:
     {
-        m_GD->m_KBS = m_keyboard->GetState();
+        m_GD->m_KeyboardState = m_keyboard->GetState();
         //quit game on hiting escape
-        if (m_GD->m_KBS.Enter)
+        if (m_GD->m_KeyboardState.Enter)
         {
-            m_GD->m_GS = GS_PLAY_TPS_CAM;
+            m_GD->m_GameState = GS_PLAY_TPS_CAM;
         }
     }
     }
@@ -333,7 +221,7 @@ void Game::Render()
 
     //set which camera to be used
     m_DD->m_cam = m_cam;
-    if (m_GD->m_GS == GS_PLAY_TPS_CAM)
+    if (m_GD->m_GameState == GS_PLAY_TPS_CAM)
     {
         m_DD->m_cam = m_TPScam;
     }
@@ -617,15 +505,15 @@ void Game::OnDeviceLost()
 
 void Game::ReadInput()
 {
-    m_GD->m_KBS = m_keyboard->GetState();
-    m_GD->m_KBS_tracker.Update(m_GD->m_KBS);
+    m_GD->m_KeyboardState = m_keyboard->GetState();
+    m_GD->m_KBS_tracker.Update(m_GD->m_KeyboardState);
     //quit game on hiting escape
-    if (m_GD->m_KBS.Escape)
+    if (m_GD->m_KeyboardState.Escape)
     {
         ExitGame();
     }
 
-    m_GD->m_MS = m_mouse->GetState();
+    m_GD->m_MouseState = m_mouse->GetState();
 
     //lock the cursor to the centre of the window
     RECT window;
